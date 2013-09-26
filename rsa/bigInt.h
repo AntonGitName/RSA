@@ -4,6 +4,11 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <complex>
+
+typedef std::complex<double> complex_double;
+
+const double PI = 3.1415926535897932384626433832795028841971;
 
 class bigInt
 {
@@ -33,7 +38,8 @@ public:
     std::string toString() const;
     int toInt() const {int res = 0; for (int i=int(a.size())-1;i>=0;--i) res = res * bigInt::base + a[i]; return sign?-res:res;}
     size_t toUInt() const {size_t res = 0; for (int i=int(a.size())-1;i>=0;--i) res = res * bigInt::base + a[i]; return res;}
-    
+	size_t size() const {return a.size();}
+
     const bigInt operator+() const {return *this;}
     const bigInt operator-() const {bigInt x(*this); x.sign ^= true; return x;}
     bigInt& operator=(const bigInt & x) { a = x.a; sign = x.sign; return *this;}
@@ -50,7 +56,8 @@ public:
 
     friend inline const bigInt operator+(const bigInt&, const bigInt&);
     friend inline const bigInt operator-(const bigInt&, const bigInt&);
-    friend inline const bigInt operator*(const bigInt&, const bigInt&);
+    
+	friend inline const bigInt operator*(const bigInt&, const bigInt&);
     friend inline const bigInt operator/(const bigInt&, const int&);
     friend inline const bigInt operator/(const bigInt&, const bigInt&);
     friend const bigInt operator%(const bigInt&, const bigInt&);

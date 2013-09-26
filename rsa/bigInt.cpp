@@ -1,12 +1,62 @@
 #include "bigInt.h"
 
-
-const bigInt fastMul(const bigInt&, const bigInt&)
-{
-
+void fft (std::vector<complex_double> & a, bool invert) {
+	int n = (int) a.size();
+	if (n == 1)  return;
+ 
+	std::vector<complex_double> a0 (n/2),  a1 (n/2);
+	for (int i = 0, j = 0; i < n; i += 2, ++j)
+	{
+		a0[j] = a[i];
+		a1[j] = a[i + 1];
+	}
+	fft (a0, invert);
+	fft (a1, invert);
+ 
+	double ang = 2*PI/n * (invert ? -1 : 1);
+	complex_double w(1),  wn (cos(ang), sin(ang));
+	for (int i = 0; i < n / 2; ++i)
+	{
+		a[i] = a0[i] + w * a1[i];
+		a[i + n / 2] = a0[i] - w * a1[i];
+		if (invert)
+			a[i] /= 2,  a[i + n / 2] /= 2;
+		w *= wn;
+	}
 }
 
-
+const bigInt fastMul(const bigInt& a, const bigInt& b)
+{
+	bigInt product;
+	std::vector<complex_double> fa (a.a.begin(), a.a.end()),  fb (b.a.begin(), b.a.end());
+	size_t n = 1;
+	while (n < std::max (a.size(), b.size()))  n *= 2;
+	n <<= 1;
+	fa.resize (n),  fb.resize (n);
+ 
+	fft (fa, false),  fft (fb, false);
+	for (size_t i=0; i<n; ++i)
+		fa[i] *= fb[i];
+	fft (fa, true);
+ 
+	product.a.resize(n);
+	for (size_t i = 0; i < n; ++i)
+	{
+		if (fa[i].real() > 0)
+			product.a[i] = int (fa[i].real() + 0.5);
+		else
+			product.a[i] = int (fa[i].real() - 0.5);
+	}
+	int carry = 0;
+	for (size_t i = 0; i < n; ++i)
+	{
+		product.a[i] += carry;
+		carry = product.a[i] / bigInt::base;
+		product.a[i] %= bigInt::base;
+	}
+	product.deleteNulls();
+	return product;
+}
 
 
 std::ostream& operator<< (std::ostream &out, const bigInt &x) {return out << x.toString();}
