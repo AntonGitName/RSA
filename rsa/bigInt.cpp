@@ -28,6 +28,7 @@ void fft (std::vector<complex_double> & a, bool invert) {
 const bigInt fastMul(const bigInt& a, const bigInt& b)
 {
 	bigInt product;
+	bool differentSigns = a.sign != b.sign;
 	std::vector<complex_double> fa (a.a.begin(), a.a.end()),  fb (b.a.begin(), b.a.end());
 	size_t n = 1;
 	while (n < std::max (a.size(), b.size()))  n *= 2;
@@ -54,6 +55,7 @@ const bigInt fastMul(const bigInt& a, const bigInt& b)
 		carry = product.a[i] / bigInt::base;
 		product.a[i] %= bigInt::base;
 	}
+	product.sign = differentSigns;
 	product.deleteNulls();
 	return product;
 }
@@ -61,7 +63,13 @@ const bigInt fastMul(const bigInt& a, const bigInt& b)
 
 std::ostream& operator<< (std::ostream &out, const bigInt &x) {return out << x.toString();}
 
-std::istream& operator>> (std::istream &in, bigInt &x) {std::string s; in >> s; x = bigInt(s); return in;}
+std::istream& operator>> (std::istream &in, bigInt &x)
+{
+	std::string s;
+	in >> s;
+	x = bigInt(s);
+	return in;
+}
 
 const bigInt power(bigInt a, bigInt b, const bigInt& m) // a ^ b mod m
 {

@@ -33,7 +33,15 @@ private:
 public:
     bigInt(size_t x) : sign(false) {while (x) a.push_back(x % base), x /= base;}
     bigInt(int x = 0) : sign(x < 0) {x = (x > 0)?x:-x;while(x) a.push_back(x % base), x /= base;}
-    bigInt(std::string s){*this = 0; for (size_t i = 0; i < s.length(); ++i) *this = 10 * *this + (s[i] - '0');}
+    bigInt(std::string s) {
+		bool sign1 = false;
+		*this = 0;
+		if (!s.empty())
+			sign1 = s[0] == '-';
+		for (size_t i = int(sign1); i < s.length(); ++i)
+			*this = 10 * *this + (s[i] - '0');
+		sign = sign1;
+	}
     
     std::string toString() const;
     int toInt() const {int res = 0; for (int i=int(a.size())-1;i>=0;--i) res = res * bigInt::base + a[i]; return sign?-res:res;}

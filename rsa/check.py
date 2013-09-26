@@ -1,0 +1,10 @@
+answer1_file = open("answer.txt", "r")
+answer2_file = open("MY_answer.txt", "r")
+diff_file = open("diff.txt", "w")
+for a in answer1_file.readlines():
+	x = int(a)
+	y = int(answer2_file.readline())
+	diff_file.write('{0}\n'.format(x == y))
+answer1_file.close()
+answer2_file.close()
+diff_file.close()
