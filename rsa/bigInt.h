@@ -34,24 +34,26 @@ public:
     bigInt(size_t x) : sign(false) {while (x) a.push_back(x % base), x /= base;}
     bigInt(int x = 0) : sign(x < 0) {x = (x > 0)?x:-x;while(x) a.push_back(x % base), x /= base;}
     bigInt(std::string s) {
-		bool sign1 = false;
-		*this = 0;
-		if (!s.empty())
-			sign1 = s[0] == '-';
-		for (size_t i = int(sign1); i < s.length(); ++i)
-			*this = 10 * *this + (s[i] - '0');
-		sign = sign1;
-	}
+        bool sign1 = false;
+        *this = 0;
+        if (!s.empty())
+            sign1 = s[0] == '-';
+        for (size_t i = int(sign1); i < s.length(); ++i)
+            *this = 10 * *this + (s[i] - '0');
+        sign = sign1;
+    }
     
     std::string toString() const;
     int toInt() const {int res = 0; for (int i=int(a.size())-1;i>=0;--i) res = res * bigInt::base + a[i]; return sign?-res:res;}
     size_t toUInt() const {size_t res = 0; for (int i=int(a.size())-1;i>=0;--i) res = res * bigInt::base + a[i]; return res;}
-	size_t size() const {return a.size();}
+    size_t size() const {return a.size();}
 
+    void changeSign() {sign ^= true;}
     const bigInt operator+() const {return *this;}
     const bigInt operator-() const {bigInt x(*this); x.sign ^= true; return x;}
     bigInt& operator=(const bigInt & x) { a = x.a; sign = x.sign; return *this;}
     bigInt& operator+=(const bigInt & x) { *this = *this + x; return *this;}
+    bigInt& operator-=(const bigInt & x) { *this = *this - x; return *this;}
     bigInt& operator*=(const bigInt & x) { *this = *this * x; return *this;}
     bigInt& operator/=(const bigInt & x) { *this = *this / x; return *this;}
     bigInt& operator++() { *this = *this + bigInt(1); return *this;}
@@ -65,7 +67,7 @@ public:
     friend inline const bigInt operator+(const bigInt&, const bigInt&);
     friend inline const bigInt operator-(const bigInt&, const bigInt&);
     
-	friend inline const bigInt operator*(const bigInt&, const bigInt&);
+    friend inline const bigInt operator*(const bigInt&, const bigInt&);
     friend inline const bigInt operator/(const bigInt&, const int&);
     friend inline const bigInt operator/(const bigInt&, const bigInt&);
     friend const bigInt operator%(const bigInt&, const bigInt&);
@@ -82,5 +84,8 @@ public:
 
 std::ostream& operator<< (std::ostream &out, const bigInt &x);
 std::istream& operator>> (std::istream &in, bigInt &x);
+
+const bigInt power(bigInt a, bigInt b);
+const bigInt power(bigInt a, bigInt b, const bigInt& m);
 
 #endif
