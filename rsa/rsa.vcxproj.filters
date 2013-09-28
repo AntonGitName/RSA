@@ -24,9 +24,15 @@
     <ClCompile Include="generatePrime.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="checkPrime.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bigInt.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="checkPrime.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

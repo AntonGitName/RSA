@@ -48,10 +48,12 @@ public:
     size_t toUInt() const {size_t res = 0; for (int i=int(a.size())-1;i>=0;--i) res = res * bigInt::base + a[i]; return res;}
 	size_t size() const {return a.size();}
 
+    void changeSign() {sign ^= true;}
     const bigInt operator+() const {return *this;}
     const bigInt operator-() const {bigInt x(*this); x.sign ^= true; return x;}
     bigInt& operator=(const bigInt & x) { a = x.a; sign = x.sign; return *this;}
     bigInt& operator+=(const bigInt & x) { *this = *this + x; return *this;}
+    bigInt& operator-=(const bigInt & x) { *this = *this - x; return *this;}
     bigInt& operator*=(const bigInt & x) { *this = *this * x; return *this;}
     bigInt& operator/=(const bigInt & x) { *this = *this / x; return *this;}
     bigInt& operator++() { *this = *this + bigInt(1); return *this;}
@@ -82,5 +84,8 @@ public:
 
 std::ostream& operator<< (std::ostream &out, const bigInt &x);
 std::istream& operator>> (std::istream &in, bigInt &x);
+
+const bigInt power(bigInt a, bigInt b);
+const bigInt power(bigInt a, bigInt b, const bigInt& m);
 
 #endif

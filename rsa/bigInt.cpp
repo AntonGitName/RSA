@@ -71,6 +71,15 @@ std::istream& operator>> (std::istream &in, bigInt &x)
 	return in;
 }
 
+const bigInt power(bigInt a, bigInt b)
+{
+    if (b == 0) return 1;
+    if (b == 1) return a;
+    bigInt k = b / 2, t = power(a, k);
+    t = (t * t);
+    return (b % 2 == 1) ? (a * t): t;
+}
+
 const bigInt power(bigInt a, bigInt b, const bigInt& m) // a ^ b mod m
 {
     if (b == 0) return 1;
@@ -177,6 +186,24 @@ inline const bigInt operator-(const bigInt& a, const bigInt& b)
 
 inline const bigInt operator*(const bigInt& a, const bigInt& b)
 {
+    if (b == 2)
+    {
+        bigInt c = a;
+        c.a.push_back(0);
+        int carry = 0;
+        for (size_t i = 0; i < c.a.size(); ++i)
+        {
+            c.a[i] = carry + (c.a[i] << 1);
+            if (c.a[i] > bigInt::base)
+            {
+                carry = 1;
+                c.a[i] -= bigInt::base;
+            }
+        }
+        if (c.a.back() == 0)
+            c.a.pop_back();
+        return c;
+    }
     bigInt c;
     c.sign = a.sign ^ b.sign;
     c.a.assign(a.a.size() + b.a.size(), 0);
@@ -195,29 +222,58 @@ inline const bigInt operator/(const bigInt& x, const bigInt& y)
 {
     if (x.absLess(y))
         return 0;
-    bigInt c, l(1), r;
+
+    if (y == 2)
+    {
+        bigInt c = x;
+        int carry = 0;
+        for (size_t i = c.a.size() - 1; i > 0; --i)
+        {
+            c.a[i - 1] += bigInt::base * (c.a[i] & 1);
+            c.a[i] >>= 1;
+        }
+        c.a[0] >>= 1;
+        if (c.a.back() == 0)
+            c.a.pop_back();
+        return c;
+    }
+
+    bigInt a = x;
+    bigInt b = y;
+    bigInt l = 1;
+    bigInt r;
+    bigInt m;
     r.a.assign((int)x.a.size()-(int)y.a.size() + 1, bigInt::base - 1);
     r.sign = false;
-    while ((l + 1) < r)
+    a.sign = false;
+    b.sign = false;
+    while (l < r)
     {
-        c = (l + r) / 2;
-        if (x.absLess(y * c))
-            r = c - 1;
+        m = (l + r + 1) / 2;
+        if (a < m * b)
+            r = m - 1;
         else
-            l = c;
+            l = m;
     }
-    c = (r * y <= x) ? r : l;
-    c.sign = x.sign ^ y.sign;
-    c.deleteNulls();
-    return c;
+    l.sign = x.sign ^ y.sign;
+    l.deleteNulls();
+    return l;
 }
 
 const bigInt operator%(const bigInt& x, const bigInt& y)
 {
+    if (x.a.empty())
+        return 0;
     if (y == 1)
         return 0;
     if (y == 2)
         return x.a[0] & 1;
+    if (y == 4)
+        return x.a[0] & 3;
+    if (y == 8)
+        return x.a[0] & 7;
+    if (y == 16)
+        return x.a[0] & 15; // Dependes on bigInt::base. Change carefully.
     return x - (x / y) * y;
 }
 
@@ -233,6 +289,20 @@ inline const bigInt operator/(const bigInt& x, const int& y)
 {
     if (y >= bigInt::base)
         return x / bigInt(y);
+    if (y == 2)
+    {
+        bigInt c = x;
+        int carry = 0;
+        for (size_t i = c.a.size() - 1; i > 0; --i)
+        {
+            c.a[i - 1] += bigInt::base * (c.a[i] & 1);
+            c.a[i] >>= 1;
+        }
+        c.a[0] >>= 1;
+        if (c.a.back() == 0)
+            c.a.pop_back();
+        return c;
+    }    
     bigInt c;
     c.sign = x.sign ^ (y < 0);
     c.a.assign(x.a.size(), 0);
