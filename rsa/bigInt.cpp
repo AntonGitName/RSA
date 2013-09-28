@@ -1,63 +1,63 @@
 #include "bigInt.h"
 
-void fft (std::vector<complex_double> & a, bool invert) {
-	int n = (int) a.size();
-	if (n == 1)  return;
+inline void fft (std::vector<complex_double> & a, bool invert) {
+    int n = (int) a.size();
+    if (n == 1)  return;
  
-	std::vector<complex_double> a0 (n/2),  a1 (n/2);
-	for (int i = 0, j = 0; i < n; i += 2, ++j)
-	{
-		a0[j] = a[i];
-		a1[j] = a[i + 1];
-	}
-	fft (a0, invert);
-	fft (a1, invert);
+    std::vector<complex_double> a0 (n/2),  a1 (n/2);
+    for (int i = 0, j = 0; i < n; i += 2, ++j)
+    {
+        a0[j] = a[i];
+        a1[j] = a[i + 1];
+    }
+    fft (a0, invert);
+    fft (a1, invert);
  
-	double ang = 2*PI/n * (invert ? -1 : 1);
-	complex_double w(1),  wn (cos(ang), sin(ang));
-	for (int i = 0; i < n / 2; ++i)
-	{
-		a[i] = a0[i] + w * a1[i];
-		a[i + n / 2] = a0[i] - w * a1[i];
-		if (invert)
-			a[i] /= 2,  a[i + n / 2] /= 2;
-		w *= wn;
-	}
+    double ang = 2*PI/n * (invert ? -1 : 1);
+    complex_double w(1),  wn (cos(ang), sin(ang));
+    for (int i = 0; i < n / 2; ++i)
+    {
+        a[i] = a0[i] + w * a1[i];
+        a[i + n / 2] = a0[i] - w * a1[i];
+        if (invert)
+            a[i] /= 2,  a[i + n / 2] /= 2;
+        w *= wn;
+    }
 }
 
 const bigInt fastMul(const bigInt& a, const bigInt& b)
 {
-	bigInt product;
-	bool differentSigns = a.sign != b.sign;
-	std::vector<complex_double> fa (a.a.begin(), a.a.end()),  fb (b.a.begin(), b.a.end());
-	size_t n = 1;
-	while (n < std::max (a.size(), b.size()))  n *= 2;
-	n <<= 1;
-	fa.resize (n),  fb.resize (n);
+    bigInt product;
+    bool differentSigns = a.sign != b.sign;
+    std::vector<complex_double> fa (a.a.begin(), a.a.end()),  fb (b.a.begin(), b.a.end());
+    size_t n = 1;
+    while (n < std::max (a.size(), b.size()))  n *= 2;
+    n <<= 1;
+    fa.resize (n),  fb.resize (n);
  
-	fft (fa, false),  fft (fb, false);
-	for (size_t i=0; i<n; ++i)
-		fa[i] *= fb[i];
-	fft (fa, true);
+    fft (fa, false),  fft (fb, false);
+    for (size_t i=0; i<n; ++i)
+        fa[i] *= fb[i];
+    fft (fa, true);
  
-	product.a.resize(n);
-	for (size_t i = 0; i < n; ++i)
-	{
-		if (fa[i].real() > 0)
-			product.a[i] = int (fa[i].real() + 0.5);
-		else
-			product.a[i] = int (fa[i].real() - 0.5);
-	}
-	int carry = 0;
-	for (size_t i = 0; i < n; ++i)
-	{
-		product.a[i] += carry;
-		carry = product.a[i] / bigInt::base;
-		product.a[i] %= bigInt::base;
-	}
-	product.sign = differentSigns;
-	product.deleteNulls();
-	return product;
+    product.a.resize(n);
+    for (size_t i = 0; i < n; ++i)
+    {
+        if (fa[i].real() > 0)
+            product.a[i] = int (fa[i].real() + 0.5);
+        else
+            product.a[i] = int (fa[i].real() - 0.5);
+    }
+    int carry = 0;
+    for (size_t i = 0; i < n; ++i)
+    {
+        product.a[i] += carry;
+        carry = product.a[i] / bigInt::base;
+        product.a[i] %= bigInt::base;
+    }
+    product.sign = differentSigns;
+    product.deleteNulls();
+    return product;
 }
 
 
@@ -65,10 +65,19 @@ std::ostream& operator<< (std::ostream &out, const bigInt &x) {return out << x.t
 
 std::istream& operator>> (std::istream &in, bigInt &x)
 {
-	std::string s;
-	in >> s;
-	x = bigInt(s);
-	return in;
+    std::string s;
+    in >> s;
+    x = bigInt(s);
+    return in;
+}
+
+const bigInt power(bigInt a, bigInt b) // a ^ b
+{
+    if (b == 0) return 1;
+    if (b == 1) return a;
+    bigInt k = b / 2, t = power(a, k);
+    t = (t * t);
+    return (b % 2 == 1) ? (a * t) : t;
 }
 
 const bigInt power(bigInt a, bigInt b)
@@ -193,8 +202,13 @@ inline const bigInt operator*(const bigInt& a, const bigInt& b)
         int carry = 0;
         for (size_t i = 0; i < c.a.size(); ++i)
         {
+<<<<<<< HEAD
             c.a[i] = carry + (c.a[i] << 1);
             if (c.a[i] > bigInt::base)
+=======
+            c.a[i] = (c.a[i] << 1) + carry;
+            if (c.a[i] >= bigInt::base)
+>>>>>>> master
             {
                 carry = 1;
                 c.a[i] -= bigInt::base;
@@ -204,7 +218,12 @@ inline const bigInt operator*(const bigInt& a, const bigInt& b)
             c.a.pop_back();
         return c;
     }
+<<<<<<< HEAD
     bigInt c;
+=======
+    return fastMul(a, b);
+    /*bigInt c;
+>>>>>>> master
     c.sign = a.sign ^ b.sign;
     c.a.assign(a.a.size() + b.a.size(), 0);
     for (size_t i = 0; i < a.a.size(); ++i)
@@ -215,13 +234,14 @@ inline const bigInt operator*(const bigInt& a, const bigInt& b)
             carry = int (cur / bigInt::base);
         }
     c.deleteNulls();
-    return c;
+    return c;*/
 }
 
 inline const bigInt operator/(const bigInt& x, const bigInt& y)
 {
     if (x.absLess(y))
         return 0;
+<<<<<<< HEAD
 
     if (y == 2)
     {
@@ -254,6 +274,36 @@ inline const bigInt operator/(const bigInt& x, const bigInt& y)
             r = m - 1;
         else
             l = m;
+=======
+    if (y == 2)
+    {
+        bigInt z = x;
+        for (size_t i = z.a.size() - 1; i > 0; --i)
+        {
+            z.a[i - 1] += bigInt::base * (z.a[i] & 1);
+            z.a[i] >>= 1;
+        }
+        z.a[0] >>= 1;
+        if (z.a.back() == 0)
+            z.a.pop_back();
+        return z;
+    }
+    bigInt a = x;
+    a.sign = false;
+    bigInt b = y;
+    b.sign = false;
+    bigInt m;
+    bigInt l = 1;
+    bigInt r;
+    r.a.assign((int)a.a.size()-(int)b.a.size() + 1, bigInt::base - 1); r.sign = false;
+    while (l < r)
+    {
+        m = (l + r + 1) / 2;
+        if (a >= m * b)
+            l = m;
+        else
+            r = m - 1;
+>>>>>>> master
     }
     l.sign = x.sign ^ y.sign;
     l.deleteNulls();
@@ -269,11 +319,19 @@ const bigInt operator%(const bigInt& x, const bigInt& y)
     if (y == 2)
         return x.a[0] & 1;
     if (y == 4)
+<<<<<<< HEAD
         return x.a[0] & 3;
     if (y == 8)
         return x.a[0] & 7;
     if (y == 16)
         return x.a[0] & 15; // Dependes on bigInt::base. Change carefully.
+=======
+        return x.a[0] % 4;
+    if (y == 8)
+        return x.a[0] % 8;
+    if (y == 16)           // Dependes on bigInt::base. Change it careful.
+        return x.a[0] % 16;
+>>>>>>> master
     return x - (x / y) * y;
 }
 
@@ -287,6 +345,19 @@ inline int numCount(int a)
 
 inline const bigInt operator/(const bigInt& x, const int& y)
 {
+    if (y == 2)
+    {
+        bigInt z = x;
+        for (size_t i = z.a.size() - 1; i > 0; --i)
+        {
+            z.a[i - 1] += bigInt::base * (z.a[i] & 1);
+            z.a[i] >>= 1;
+        }
+        z.a[0] >>= 1;
+        if (z.a.back() == 0)
+            z.a.pop_back();
+        return z;
+    }
     if (y >= bigInt::base)
         return x / bigInt(y);
     if (y == 2)
