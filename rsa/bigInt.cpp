@@ -80,6 +80,15 @@ const bigInt power(bigInt a, bigInt b) // a ^ b
     return (b % 2 == 1) ? (a * t) : t;
 }
 
+const bigInt power(bigInt a, bigInt b)
+{
+    if (b == 0) return 1;
+    if (b == 1) return a;
+    bigInt k = b / 2, t = power(a, k);
+    t = (t * t);
+    return (b % 2 == 1) ? (a * t): t;
+}
+
 const bigInt power(bigInt a, bigInt b, const bigInt& m) // a ^ b mod m
 {
     if (b == 0) return 1;
@@ -199,11 +208,16 @@ inline const bigInt operator*(const bigInt& a, const bigInt& b)
                 carry = 1;
                 c.a[i] -= bigInt::base;
             }
+			else
+			{
+				carry = 0;
+			}
         }
         if (c.a.back() == 0)
             c.a.pop_back();
         return c;
     }
+    bigInt c;
     return fastMul(a, b);
 }
 
@@ -211,7 +225,6 @@ inline const bigInt operator/(const bigInt& x, const bigInt& y)
 {
     if (x.absLess(y))
         return 0;
-<<<<<<< HEAD
     if (y == 2)
     {
         bigInt z = x;
@@ -259,7 +272,7 @@ const bigInt operator%(const bigInt& x, const bigInt& y)
     if (y == 8)
         return x.a[0] & 7;
     if (y == 16)
-        return x.a[0] & 15; // Dependes on bigInt::base. Change carefully.
+        return x.a[0] & 15; // Depends on bigInt::base. Change carefully.
     return x - (x / y) * y;
 }
 

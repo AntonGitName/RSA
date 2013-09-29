@@ -6,19 +6,13 @@
 
 using namespace std;
 
-
-
 int main()
 {
     bigInt a("359334085968622831041960188598043661065388726959079837"), b, m;
     //freopen("test.txt", "r", stdin);
     //freopen("primes.txt", "w", stdout);
 
-    //while (cin >> a >> b >> m)
-    //    cout << power(a, b, m) << endl;
 
-    //freopen("test.txt", "r", stdin);
-    //freopen("primes.txt", "w", stdout);
 
     //a = 2147483647;
     //cout << a << " " << isPrime(a) << endl;
