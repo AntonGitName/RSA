@@ -3,6 +3,8 @@
 
 #include "bigInt.h"
 #include "checkPrime.h"
+#include "generatePrime.h"
+
 
 using namespace std;
 
@@ -13,13 +15,16 @@ int main()
     //freopen("primes.txt", "w", stdout);
 
 
-
+    //a = 1000000007;
     //a = 2147483647;
-    //cout << a << " " << isPrime(a) << endl;
-	
-    for (bigInt a = 2; a < 10000; ++a)
+    a = getPrime();
+
+    cout << a << " " << isPrime(a) << endl;
+
+    
+    /*for (bigInt a = 2; a < 100; ++a)
         if (isPrime(a))
-            cout << a << endl;
+            cout << a << endl;*/
     
     return 0;
 }

@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClInclude Include="bigInt.h" />
     <ClInclude Include="checkPrime.h" />
+    <ClInclude Include="generatePrime.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -71,6 +71,16 @@ std::istream& operator>> (std::istream &in, bigInt &x)
     return in;
 }
 
+const bigInt power(bigInt a, int b) // a ^ b
+{
+    if (b == 0) return 1;
+    if (b == 1) return a;
+    int k = b / 2;
+    bigInt t = power(a, k);
+    t = (t * t);
+    return (b % 2 == 1) ? (a * t) : t;
+}
+
 const bigInt power(bigInt a, bigInt b) // a ^ b
 {
     if (b == 0) return 1;
@@ -78,15 +88,6 @@ const bigInt power(bigInt a, bigInt b) // a ^ b
     bigInt k = b / 2, t = power(a, k);
     t = (t * t);
     return (b % 2 == 1) ? (a * t) : t;
-}
-
-const bigInt power(bigInt a, bigInt b)
-{
-    if (b == 0) return 1;
-    if (b == 1) return a;
-    bigInt k = b / 2, t = power(a, k);
-    t = (t * t);
-    return (b % 2 == 1) ? (a * t): t;
 }
 
 const bigInt power(bigInt a, bigInt b, const bigInt& m) // a ^ b mod m
@@ -263,6 +264,8 @@ const bigInt operator%(const bigInt& x, const bigInt& y)
 {
     if (x.a.empty())
         return 0;
+    if (x.absLess(y))
+        return x;
     if (y == 1)
         return 0;
     if (y == 2)

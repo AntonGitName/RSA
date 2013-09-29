@@ -85,6 +85,7 @@ public:
 std::ostream& operator<< (std::ostream &out, const bigInt &x);
 std::istream& operator>> (std::istream &in, bigInt &x);
 
+const bigInt power(bigInt a, int b);
 const bigInt power(bigInt a, bigInt b);
 const bigInt power(bigInt a, bigInt b, const bigInt& m);
 
