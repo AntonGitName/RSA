@@ -44,11 +44,11 @@ const bigInt fastMul(const bigInt& a, const bigInt& b)
     for (size_t i = 0; i < n; ++i)
     {
         if (fa[i].real() > 0)
-            product.a[i] = int (fa[i].real() + 0.5);
+            product.a[i] = long long (fa[i].real() + 0.5);
         else
-            product.a[i] = int (fa[i].real() - 0.5);
+            product.a[i] = long long (fa[i].real() - 0.5);
     }
-    int carry = 0;
+    long long carry = 0;
     for (size_t i = 0; i < n; ++i)
     {
         product.a[i] += carry;
@@ -73,8 +73,8 @@ std::istream& operator>> (std::istream &in, bigInt &x)
 
 const bigInt power(bigInt a, int b) // a ^ b
 {
-    if (b == 0) return 1;
-    if (b == 1) return a;
+    if (b == 0LL) return 1;
+    if (b == 1LL) return a;
     int k = b / 2;
     bigInt t = power(a, k);
     t = (t * t);
@@ -111,7 +111,7 @@ std::string bigInt::toString() const
     int log10base = 1, l = 1;
     while ((l *= 10) < bigInt::base)
         ++log10base;
-    int y = a.back(), k = 0;
+    long long y = a.back(), k = 0;
     while (y)
     {
         tmp.push_back(y % 10 + '0');
@@ -125,7 +125,7 @@ std::string bigInt::toString() const
     for (int i = (int)a.size() - 2; i >= 0; --i)
     {
         tmp.assign(log10base, '0');
-        int x = a[i], k = 0;
+        long long x = a[i], k = 0;
         while (x)
         {
             tmp[log10base - 1 - k++] = x % 10 + '0';
@@ -135,18 +135,6 @@ std::string bigInt::toString() const
     }
     return str;
 }
-
-//bool bigInt::absLess(const bigInt & x) const
-//{
-//    if (a.size() < x.a.size())
-//        return true;
-//    if (a.size() > x.a.size())
-//        return false;
-//    for (int i = (int)a.size() - 1; i >= 0; --i)
-//        if (a[i] != x.a[i])
-//            return a[i] < x.a[i];
-//    return false;
-//}
 
 inline const bigInt operator+(const bigInt& a, const bigInt& b)
 {
@@ -209,16 +197,15 @@ inline const bigInt operator*(const bigInt& a, const bigInt& b)
                 carry = 1;
                 c.a[i] -= bigInt::base;
             }
-			else
-			{
-				carry = 0;
-			}
+            else
+            {
+                carry = 0;
+            }
         }
         if (c.a.back() == 0)
             c.a.pop_back();
         return c;
     }
-    bigInt c;
     return fastMul(a, b);
 }
 
@@ -287,7 +274,7 @@ inline int numCount(int a)
     return x;
 }
 
-inline const bigInt operator/(const bigInt& x, const int& y)
+inline const bigInt operator/(const bigInt& x, const long long& y)
 {
     if (y == 2)
     {
@@ -295,38 +282,25 @@ inline const bigInt operator/(const bigInt& x, const int& y)
         for (size_t i = z.a.size() - 1; i > 0; --i)
         {
             z.a[i - 1] += bigInt::base * (z.a[i] & 1);
-            z.a[i] >>= 1;
+            z.a[i] >>= 1LL;
         }
-        z.a[0] >>= 1;
+        z.a[0] >>= 1LL;
         if (z.a.back() == 0)
             z.a.pop_back();
         return z;
     }
     if (y >= bigInt::base)
         return x / bigInt(y);
-    if (y == 2)
-    {
-        bigInt c = x;
-        int carry = 0;
-        for (size_t i = c.a.size() - 1; i > 0; --i)
-        {
-            c.a[i - 1] += bigInt::base * (c.a[i] & 1);
-            c.a[i] >>= 1;
-        }
-        c.a[0] >>= 1;
-        if (c.a.back() == 0)
-            c.a.pop_back();
-        return c;
-    }    
+
     bigInt c;
     c.sign = x.sign ^ (y < 0);
     c.a.assign(x.a.size(), 0);
-    int carry = 0;
+    long long carry = 0;
     for (int i = (int) x.a.size() - 1; i >= 0; --i)
     {
-        int cur = x.a[i] + carry * bigInt::base;
-        c.a[i] = int (cur / y);
-        carry = int (cur % y);
+        long long cur = x.a[i] + carry * bigInt::base;
+        c.a[i] = long long (cur / y);
+        carry = long long (cur % y);
     }
     c.deleteNulls();
     return c;
@@ -374,4 +348,24 @@ const bool operator!=(const bigInt&x, const bigInt&y)
         if (x.a[i] != y.a[i])
             return true;
     return false;
+}
+
+const std::vector<bool> getBits(const bigInt &a)
+{
+    bigInt b = a;
+    std::vector<bool> v;
+    while (b > 0)
+    {
+        int x = (b % 16).toInt();
+        for (int i = 0; i < 4; ++i)
+        {
+            v.push_back(x & 1);
+            x >>= 1;
+        }
+        b /= 16;
+    }
+    while (!v.back())
+        v.pop_back();
+    std::reverse(v.begin(), v.end());
+    return v;
 }

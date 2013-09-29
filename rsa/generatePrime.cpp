@@ -5,16 +5,16 @@ const bigInt MAXNUM = power(2, 130);
 
 bigInt getBigRandom(std::default_random_engine &generator, bigInt l, bigInt r)
 {
-    if ((r - l) > std::numeric_limits<int>::max())
+    if ((r - l) > std::numeric_limits<long long>::max())
     {
-        std::uniform_int_distribution<int> distribution(0, std::numeric_limits<int>::max());
-        bigInt part = (r - l) / std::numeric_limits<int>::max();
+        std::uniform_int_distribution<long long> distribution(0, std::numeric_limits<long long>::max());
+        bigInt part = (r - l) / std::numeric_limits<long long>::max();
         bigInt newL = l + part * distribution(generator);
         bigInt newR = newL + part;
         return getBigRandom(generator, newL , newR);
     }
-    int dist = (r - l).toInt();
-    std::uniform_int_distribution<int> distribution(0, dist);
+    long long dist = (r - l).toInt();
+    std::uniform_int_distribution<long long> distribution(0, dist);
     return l + distribution(generator);
 }
 

@@ -140,7 +140,7 @@ inline int jacobi(bigInt a, bigInt b)
         }
         if (t & 1)
         {
-            int x = (b % 8).toInt();
+            int x = (int)(b % 8).toInt();
             if (x == 3 || x == 5) r = -r;
         }
         if( ((a % 4) == 3) && ((b % 4) == 3)) r = -r;
@@ -167,23 +167,11 @@ inline int test_bit(bigInt a, int k)
 {
     while (k--)
         a /= 2;
-    return (a % 2).toInt();
+    return (int)(a % 2).toInt();
 }
 
-bool lucas_selfridge (const bigInt & n, bigInt unused)
+bigInt getDD(const bigInt &n) // original
 {
-    // сначала проверяем тривиальные случаи
-    if (n == 2)
-        return true;
-    if (n < 2 || (n % 2 == 0))
-        return false;
-    // проверяем, что n не является точным квадратом, иначе алгоритм даст ошибку
-    if (perfect_square (n))
-        return false;
-
-    // алгоритм Селфриджа: находим первое число d такое, что:
-    // jacobi(d,n)=-1 и оно принадлежит ряду { 5,-7,9,-11,13,... }
-    
     bigInt dd = 5;
     for (bool positiveSign = true;;positiveSign ^= true)
     {
@@ -206,10 +194,44 @@ bool lucas_selfridge (const bigInt & n, bigInt unused)
         dd += (positiveSign ? 2 : -2);
         dd.changeSign();
     }
+    return dd;
+}
+
+int getDD1(const bigInt &n) // changed
+{
+    int dd;
+	for (int d_abs = 5, d_sign = 1; ; d_sign = -d_sign, ++++d_abs)
+	{
+		dd = d_abs * d_sign;
+		bigInt g = gcd (n, d_abs);
+		if (1 < g && g < n)
+			// нашли делитель - d_abs
+			return false;
+		if (jacobi (bigInt(dd), n) == -1)
+			break;
+	}
+    return dd;
+}
+
+bool lucas_selfridge (const bigInt & n)
+{
+    // сначала проверяем тривиальные случаи
+    if (n == 2)
+        return true;
+    if (n < 2 || (n % 2 == 0))
+        return false;
+    // проверяем, что n не является точным квадратом, иначе алгоритм даст ошибку
+    if (perfect_square (n))
+        return false;
+
+    // алгоритм Селфриджа: находим первое число d такое, что:
+    // jacobi(d,n)=-1 и оно принадлежит ряду { 5,-7,9,-11,13,... }
+    
+    int dd = getDD1(n);
 
     // параметры Селфриджа
     bigInt p = 1;
-    bigInt q = (p*p - dd) / 4;
+    int q = (1 - dd) / 4;
     
     // разлагаем n+1 = d*2^s
     bigInt n_1 = n + 1;
@@ -225,7 +247,8 @@ bool lucas_selfridge (const bigInt & n, bigInt unused)
         qm = q,
         qm2 = q*2,
         qkd = q;
-    for (unsigned bit = 1, bits = bits_in_number(d); bit < bits; bit++)
+    std::vector<bool> bits = getBits(d);
+    for (unsigned bit = 1, bitM = bits.size(); bit < bitM; ++bit)////for (unsigned bit = 1, bits = bits_in_number(d); bit < bits; bit++)//
     {
         u2m = (u2m * v2m) % n; // mulmod (u2m, v2m, n);
         v2m = (v2m * v2m) % n; // mulmod (v2m, v2m, n);
@@ -235,7 +258,7 @@ bool lucas_selfridge (const bigInt & n, bigInt unused)
         qm = (qm * qm) % n; // mulmod (qm, qm, n);
         qm2 = qm;
         qm2 *= 2;
-        if (test_bit (d, bit))
+        if (test_bit (d, bit))//if(bits[bit]) //
         {
             bigInt t1, t2;
             t1 = u2m;
@@ -302,5 +325,5 @@ bool isPrime(const bigInt& a)
         return false;
     if (!miller_rabin(a, 2))
         return false;
-    return lucas_selfridge(a, 0);
+    return lucas_selfridge(a);
 }
