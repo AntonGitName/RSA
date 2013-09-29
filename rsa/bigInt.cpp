@@ -205,24 +205,13 @@ inline const bigInt operator*(const bigInt& a, const bigInt& b)
         return c;
     }
     return fastMul(a, b);
-    /*bigInt c;
-    c.sign = a.sign ^ b.sign;
-    c.a.assign(a.a.size() + b.a.size(), 0);
-    for (size_t i = 0; i < a.a.size(); ++i)
-        for (int j = 0, carry = 0; j < (int)b.a.size() || carry; ++j)
-        {
-            int cur = c.a[i+j] + a.a[i] * (j < (int)b.a.size() ? b.a[j] : 0) + carry;
-            c.a[i+j] = int (cur % bigInt::base);
-            carry = int (cur / bigInt::base);
-        }
-    c.deleteNulls();
-    return c;*/
 }
 
 inline const bigInt operator/(const bigInt& x, const bigInt& y)
 {
     if (x.absLess(y))
         return 0;
+<<<<<<< HEAD
     if (y == 2)
     {
         bigInt z = x;
@@ -266,11 +255,11 @@ const bigInt operator%(const bigInt& x, const bigInt& y)
     if (y == 2)
         return x.a[0] & 1;
     if (y == 4)
-        return x.a[0] % 4;
+        return x.a[0] & 3;
     if (y == 8)
-        return x.a[0] % 8;
-    if (y == 16)           // Dependes on bigInt::base. Change it careful.
-        return x.a[0] % 16;
+        return x.a[0] & 7;
+    if (y == 16)
+        return x.a[0] & 15; // Dependes on bigInt::base. Change carefully.
     return x - (x / y) * y;
 }
 
@@ -299,6 +288,20 @@ inline const bigInt operator/(const bigInt& x, const int& y)
     }
     if (y >= bigInt::base)
         return x / bigInt(y);
+    if (y == 2)
+    {
+        bigInt c = x;
+        int carry = 0;
+        for (size_t i = c.a.size() - 1; i > 0; --i)
+        {
+            c.a[i - 1] += bigInt::base * (c.a[i] & 1);
+            c.a[i] >>= 1;
+        }
+        c.a[0] >>= 1;
+        if (c.a.back() == 0)
+            c.a.pop_back();
+        return c;
+    }    
     bigInt c;
     c.sign = x.sign ^ (y < 0);
     c.a.assign(x.a.size(), 0);

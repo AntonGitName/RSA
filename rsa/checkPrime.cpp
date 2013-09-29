@@ -296,7 +296,6 @@ bool lucas_selfridge (const bigInt & n, bigInt unused)
 
 }
 
-
 bool isPrime(const bigInt& a)
 {
     if (!checkSmall(a))

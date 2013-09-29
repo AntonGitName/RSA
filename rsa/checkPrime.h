@@ -3,6 +3,6 @@
 
 #include "bigInt.h"
 
-bool isPrime(const bigInt& a);
+bool isPrime(const bigInt&);
 
 #endif
